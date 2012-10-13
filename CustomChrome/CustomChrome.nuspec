@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>CustomChrome</id>
+    <version>$version$</version>
+    <title>CustomChrome</title>
+    <authors>Pieter van Ginkel</authors>
+    <owners>Pieter van Ginkel</owners>
+    <licenseUrl>http://www.gnu.org/licenses/lgpl-3.0.txt</licenseUrl>
+    <projectUrl>http://github.com/pvginkel/CustomChrome</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Library to ease adding custom chrome to a form with an implementation for the Visual Studio 2012 chrome.</description>
+    <copyright>Pieter van Ginkel © 2012</copyright>
+    <tags>winforms chrome</tags>
+  </metadata>
+</package>
