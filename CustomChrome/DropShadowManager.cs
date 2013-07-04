@@ -117,6 +117,9 @@ namespace CustomChrome
 
         private void Synchronize(Rectangle bounds)
         {
+            if (_controls == null)
+                return;
+
             for (int i = 0; i < _controls.Length; i++)
             {
                 _controls[i].Synchronize(bounds);
