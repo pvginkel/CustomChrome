@@ -61,6 +61,7 @@
     <Compile Include="ImageCache.cs" />
     <Compile Include="ImageCacheManager.cs" />
     <Compile Include="ImageMaps.cs" />
+    <Compile Include="ImageUtil.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="ChromeManager.cs" />
     <Compile Include="NonClientHitTest.cs" />
@@ -70,6 +71,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SystemCommand.cs" />
     <Compile Include="SystemCommandEventHandler.cs" />
+    <Compile Include="VisualStudioButton.cs" />
+    <Compile Include="VisualStudioButtonCollection.cs" />
+    <Compile Include="VisualStudioButtonPaintEventArgs.cs" />
     <Compile Include="VisualStudioFormChrome.ButtonState.cs">
       <SubType>Component</SubType>
     </Compile>

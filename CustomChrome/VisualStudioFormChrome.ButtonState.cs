@@ -11,11 +11,14 @@ namespace CustomChrome
         private class ButtonStates
         {
             public ChromeButton OverButton { get; private set; }
+            public VisualStudioButton OverExtraButton { get; private set; }
             public ChromeButton DownButton { get; private set; }
+            public VisualStudioButton DownExtraButton { get; private set; }
             public bool DrawIcon { get; private set; }
             public ButtonState Minimize { get; private set; }
             public ButtonState MaximizeRestore { get; private set; }
             public ButtonState Close { get; private set; }
+            public List<ButtonState> ExtraButtons { get; private set; }
             public int RightOffset { get; private set; }
 
             public ButtonStates(VisualStudioFormChrome parent)
@@ -42,18 +45,43 @@ namespace CustomChrome
                     parent._formChrome.AdjustedResizeBorderThickness.Left;
 
                 if (drawClose)
-                    Close = GetButtonState(parent, ref rightOffset, ChromeButton.Close, enableClose);
+                    Close = GetButtonState(parent, ref rightOffset, ChromeButton.Close, enableClose, null);
                 else
                     Close = new ButtonState(ChromeButton.Close);
                 if (drawMaximizeRestore)
-                    MaximizeRestore = GetButtonState(parent, ref rightOffset, ChromeButton.MaximizeRestore, enableMaximizeRestore);
+                    MaximizeRestore = GetButtonState(parent, ref rightOffset, ChromeButton.MaximizeRestore, enableMaximizeRestore, null);
                 if (drawMinimize)
-                    Minimize = GetButtonState(parent, ref rightOffset, ChromeButton.Minimize, enableMinimize);
+                    Minimize = GetButtonState(parent, ref rightOffset, ChromeButton.Minimize, enableMinimize, null);
+
+                ProcessExtraButtons(parent, ref rightOffset);
 
                 RightOffset = rightOffset;
             }
 
-            private ButtonState GetButtonState(VisualStudioFormChrome parent, ref int offset, ChromeButton button, bool enabled)
+            private void ProcessExtraButtons(VisualStudioFormChrome parent, ref int rightOffset)
+            {
+                ExtraButtons = new List<ButtonState>(parent.Buttons.Count);
+
+                for (int i = parent.Buttons.Count - 1; i >= 0; i--)
+                {
+                    var extraButton = parent.Buttons[i];
+                    if (!extraButton.Visible)
+                        continue;
+
+                    ExtraButtons.Insert(
+                        0,
+                        GetButtonState(
+                            parent,
+                            ref rightOffset,
+                            ChromeButton.None,
+                            extraButton.Enabled,
+                            extraButton
+                        )
+                    );
+                }
+            }
+
+            private ButtonState GetButtonState(VisualStudioFormChrome parent, ref int offset, ChromeButton button, bool enabled, VisualStudioButton extraButton)
             {
                 offset -= ButtonSize.Width;
 
@@ -85,12 +113,28 @@ namespace CustomChrome
                     state = over ? ChromeButtonState.Over : ChromeButtonState.Enabled;
                 }
 
-                if (state == ChromeButtonState.Over)
-                    OverButton = button;
-                else if (state == ChromeButtonState.Down)
-                    DownButton = button;
+                if (extraButton != null)
+                {
+                    extraButton.IsOver = false;
+                    extraButton.IsDown = false;
+                }
 
-                return new ButtonState(button, state, true, bounds);
+                if (state == ChromeButtonState.Over)
+                {
+                    OverButton = button;
+                    OverExtraButton = extraButton;
+                    if (extraButton != null)
+                        extraButton.IsOver = true;
+                }
+                else if (state == ChromeButtonState.Down)
+                {
+                    DownButton = button;
+                    DownExtraButton = extraButton;
+                    if (extraButton != null)
+                        extraButton.IsDown = true;
+                }
+
+                return new ButtonState(button, state, true, bounds, extraButton);
             }
 
             private bool CanClose(VisualStudioFormChrome parent)
@@ -111,21 +155,23 @@ namespace CustomChrome
         private class ButtonState
         {
             public ChromeButton Button { get; private set; }
+            public VisualStudioButton ExtraButton { get; private set; }
             public ChromeButtonState State { get; private set; }
             public bool Draw { get; private set; }
             public Rectangle Bounds { get; private set; }
 
             public ButtonState(ChromeButton button)
-                : this(button, ChromeButtonState.Disabled, false, Rectangle.Empty)
+                : this(button, ChromeButtonState.Disabled, false, Rectangle.Empty, null)
             {
             }
 
-            public ButtonState(ChromeButton button, ChromeButtonState state, bool draw, Rectangle bounds)
+            public ButtonState(ChromeButton button, ChromeButtonState state, bool draw, Rectangle bounds, VisualStudioButton extraButton)
             {
                 Button = button;
                 State = state;
                 Draw = draw;
                 Bounds = bounds;
+                ExtraButton = extraButton;
             }
         }
     }

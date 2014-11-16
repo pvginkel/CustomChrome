@@ -16,6 +16,8 @@ namespace CustomChrome
         private CornerRadius _cornerRadius;
         private Size _regionSize;
         private bool _maximizedRegion;
+        private int _updateDepth;
+        private bool _paintPending;
 
         [DefaultValue(0)]
         public int CaptionHeight { get; set; }
@@ -66,7 +68,10 @@ namespace CustomChrome
 
         public void PaintNonClientArea()
         {
-            _chromeManager.PaintNonClientArea();
+            if (_updateDepth == 0)
+                _chromeManager.PaintNonClientArea();
+            else
+                _paintPending = true;
         }
 
         public void Invalidate()
@@ -323,6 +328,22 @@ namespace CustomChrome
         public Point PointToClient(Point location)
         {
             return _chromeManager.PointToClient(location);
+        }
+
+        public void BeginUpdate()
+        {
+            _updateDepth++;
+        }
+
+        public void EndUpdate()
+        {
+            _updateDepth--;
+
+            if (_paintPending)
+            {
+                _paintPending = false;
+                PaintNonClientArea();
+            }
         }
     }
 }

@@ -6,7 +6,8 @@ namespace CustomChrome
 {
     internal static class ImageMaps
     {
-        public static readonly int[,] Corner = new[,] {
+        public static readonly int[,] Corner =
+        {
             { 0, 0, 0, 0, 0, 1, 1, 1, 1, 1 },
             { 0, 0, 0, 1, 1, 1, 3, 3, 3, 3 },
             { 0, 0, 1, 1, 3, 3, 3, 3, 4, 5 },
@@ -19,7 +20,8 @@ namespace CustomChrome
             { 1, 3, 5, 7, 13, 23, 33, 47, 255, 0 }
         };
 
-        public static readonly int[,] Border = new[,] {
+        public static readonly int[,] Border =
+        {
             { 3 },
             { 4 },
             { 6 },
@@ -31,7 +33,8 @@ namespace CustomChrome
             { 255 }
         };
 
-        public static readonly int[,] Close = new[,] {
+        public static readonly int[,] Close =
+        {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -46,7 +49,8 @@ namespace CustomChrome
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
 
-        public static readonly int[,] Maximize = new[,] {
+        public static readonly int[,] Maximize =
+        {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 255, 255, 255, 255, 255, 255, 255, 255, 255 },
@@ -61,7 +65,8 @@ namespace CustomChrome
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
 
-        public static readonly int[,] Minimize = new[,] {
+        public static readonly int[,] Minimize =
+        {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -76,7 +81,8 @@ namespace CustomChrome
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }
         };
 
-        public static readonly int[,] Restore = new[,] {
+        public static readonly int[,] Restore =
+        {
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
             { 0, 0, 0, 255, 255, 255, 255, 255, 255, 255 },

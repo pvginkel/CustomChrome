@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Windows.Forms;
 
@@ -34,6 +35,8 @@ namespace CustomChrome
         private ChromeButton _downButton;
         private Padding _lastBorder;
         private bool _disposed;
+        private VisualStudioButton _overExtraButton;
+        private VisualStudioButton _downExtraButton;
 
         private Point? CaptureStart { get; set; }
 
@@ -118,8 +121,13 @@ namespace CustomChrome
             }
         }
 
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public VisualStudioButtonCollection Buttons { get; private set; }
+
         public VisualStudioFormChrome()
         {
+            Buttons = new VisualStudioButtonCollection(this);
+
             _formChrome = new FormChrome
             {
                 CaptionHeight = 31,
@@ -176,6 +184,11 @@ namespace CustomChrome
             if (state.Minimize.Draw)
                 DrawButton(e.Graphics, state.Minimize, e.IsMaximized);
 
+            foreach (var extraButton in state.ExtraButtons)
+            {
+                DrawButton(e.Graphics, extraButton);
+            }
+
             int leftOffset = IconOffset.X + border.Left;
 
             if (state.DrawIcon)
@@ -209,6 +222,18 @@ namespace CustomChrome
             );
         }
 
+        private void DrawButton(Graphics graphics, ButtonState button)
+        {
+            button.ExtraButton.OnPaint(new VisualStudioButtonPaintEventArgs(
+                button.ExtraButton,
+                graphics,
+                button.Bounds,
+                null,
+                false,
+                false
+            ));
+        }
+
         private void DrawButton(Graphics graphics, ButtonState button, bool isMaximized)
         {
             graphics.FillRectangle(GetButtonBackgroundBrush(button.State), button.Bounds);
@@ -239,7 +264,7 @@ namespace CustomChrome
             );
         }
 
-        private Brush GetButtonBackgroundBrush(ChromeButtonState state)
+        internal Brush GetButtonBackgroundBrush(ChromeButtonState state)
         {
             switch (state)
             {
@@ -249,19 +274,49 @@ namespace CustomChrome
             }
         }
 
+        internal Color GetForeColor(bool enabled, ChromeButtonState state)
+        {
+            if (!enabled)
+                return SystemColors.ControlDark;
+
+            switch (state)
+            {
+                case ChromeButtonState.Over: return _primaryColor;
+                case ChromeButtonState.Down: return Color.White;
+                default: return Color.Black;
+            }
+        }
+
+        internal Color GetBackColor(bool enabled, ChromeButtonState state)
+        {
+            if (!enabled)
+                return SystemColors.Control;
+
+            switch (state)
+            {
+                case ChromeButtonState.Over: return Color.White;
+                case ChromeButtonState.Down: return _primaryColor;
+                default: return SystemColors.Control;
+            }
+        }
+
         void _formChrome_NonClientMouseDown(object sender, NonClientMouseEventArgs e)
         {
             var state = new ButtonStates(this);
 
-            if (state.OverButton != ChromeButton.None)
+            if (state.OverButton != ChromeButton.None || state.OverExtraButton != null)
             {
+                _formChrome.BeginUpdate();
+
                 SetOverButton(ChromeButton.None);
+                SetOverButton(null);
                 SetDownButton(state.OverButton);
+                SetDownButton(state.OverExtraButton);
 
                 CaptureStart = e.Location;
                 Form.Capture = true;
 
-                _formChrome.PaintNonClientArea();
+                _formChrome.EndUpdate();
             }
         }
 
@@ -274,8 +329,14 @@ namespace CustomChrome
         {
             var state = new ButtonStates(this);
 
+            _formChrome.BeginUpdate();
+
             SetOverButton(state.OverButton);
+            SetOverButton(state.OverExtraButton);
             SetDownButton(state.DownButton);
+            SetDownButton(state.DownExtraButton);
+
+            _formChrome.EndUpdate();
         }
 
         void _formChrome_NonClientMouseUp(object sender, NonClientMouseEventArgs e)
@@ -301,13 +362,22 @@ namespace CustomChrome
                     break;
             }
 
+            if (_downExtraButton != null)
+                _downExtraButton.OnClick(EventArgs.Empty);
+
             Form.Capture = false;
             CaptureStart = null;
 
             var state = new ButtonStates(this);
 
+            _formChrome.BeginUpdate();
+
             SetOverButton(state.OverButton);
             SetDownButton(state.DownButton);
+            SetOverButton(state.OverExtraButton);
+            SetDownButton(state.DownExtraButton);
+
+            _formChrome.EndUpdate();
         }
 
         void _formChrome_NonClientMouseLeave(object sender, EventArgs e)
@@ -321,6 +391,7 @@ namespace CustomChrome
             if (_overButton != button)
             {
                 _overButton = button;
+                _overExtraButton = null;
                 _formChrome.PaintNonClientArea();
             }
         }
@@ -330,6 +401,27 @@ namespace CustomChrome
             if (_downButton != button)
             {
                 _downButton = button;
+                _downExtraButton = null;
+                _formChrome.PaintNonClientArea();
+            }
+        }
+
+        private void SetOverButton(VisualStudioButton extraButton)
+        {
+            if (_overExtraButton != extraButton)
+            {
+                _overButton = ChromeButton.None;
+                _overExtraButton = extraButton;
+                _formChrome.PaintNonClientArea();
+            }
+        }
+
+        private void SetDownButton(VisualStudioButton extraButton)
+        {
+            if (_downExtraButton != extraButton)
+            {
+                _downButton = ChromeButton.None;
+                _downExtraButton = extraButton;
                 _formChrome.PaintNonClientArea();
             }
         }
@@ -429,6 +521,11 @@ namespace CustomChrome
             }
 
             return _formImage;
+        }
+
+        public void PaintNonClientArea()
+        {
+            _formChrome.PaintNonClientArea();
         }
     }
 }
