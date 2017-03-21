@@ -102,6 +102,7 @@ namespace CustomChrome
                     if (Form != null && !_designMode)
                     {
                         _chromeManager = new ChromeManager(Form, this);
+                        _chromeManager.Initialize();
 
                         if (Form.IsHandleCreated)
                             UpdateFormRegion();
@@ -191,6 +192,8 @@ namespace CustomChrome
                 return;
 
             var form = (Form)ContainerControl;
+            if (form == null)
+                return;
 
             if (_chromeManager.IsMaximized && AdjustWhenMaximized)
             {

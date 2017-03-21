@@ -65,5 +65,14 @@ namespace CustomChrome.Demo
             var image = button.Enabled ? Resources.active : Resources.inactive;
             return ImageUtil.GetImage(image, e.ForeColor);
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            
+            if (visualStudioFormChrome1.ContainerControl == null)
+                visualStudioFormChrome1.ContainerControl = this;
+            else
+                visualStudioFormChrome1.ContainerControl = null;
+        }
     }
 }

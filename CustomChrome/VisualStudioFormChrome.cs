@@ -61,6 +61,8 @@ namespace CustomChrome
                         Form.MouseUp -= Form_MouseUp;
                     }
 
+                    _formChrome.ContainerControl = null;
+
                     base.Form = value;
 
                     if (Form != null && !_designMode)

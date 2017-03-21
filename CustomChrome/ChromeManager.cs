@@ -34,18 +34,21 @@ namespace CustomChrome
 
             _form = form;
             _chrome = chrome;
+        }
 
-            if (form.IsHandleCreated)
+        public void Initialize()
+        {
+            if (_form.IsHandleCreated)
             {
-                AssignHandle(form.Handle);
+                AssignHandle(_form.Handle);
                 InitializeForm();
             }
             else
             {
-                form.HandleCreated += form_HandleCreated;
+                _form.HandleCreated += form_HandleCreated;
             }
 
-            form.HandleDestroyed += form_HandleDestroyed;
+            _form.HandleDestroyed += form_HandleDestroyed;
         }
 
         void form_HandleCreated(object sender, EventArgs e)
@@ -69,6 +72,28 @@ namespace CustomChrome
 
 			// NativeMethods.DisableProcessWindowsGhosting();
 #endif
+        }
+
+        public override void ReleaseHandle()
+        {
+            RestoreForm();
+
+            base.ReleaseHandle();
+        }
+
+        private void RestoreForm()
+        {
+            NativeMethods.SetWindowTheme(Handle, null, null);
+
+            // The title bar won't redraw on it's own. This fix works around this.
+
+            string text = _form.Text;
+            _form.Text = null;
+
+            _form.BeginInvoke(new Action(() =>
+            {
+                _form.Text = text;
+            }));
         }
 
         void form_HandleDestroyed(object sender, EventArgs e)
@@ -535,5 +560,7 @@ namespace CustomChrome
                 bounds.Height - (border.Vertical + _chrome.CaptionHeight)
             );
         }
+
+        private delegate void Action();
     }
 }
